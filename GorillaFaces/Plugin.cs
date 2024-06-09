@@ -36,7 +36,7 @@ namespace GorillaFaces
             {
                 _constructedFaces = await _faceConstructor.GetFaces(Path.GetDirectoryName(typeof(Plugin).Assembly.Location));
 
-                GorillaFace face = _constructedFaces.FirstOrDefault(face => face.Name == PlayerPrefs.GetString("GorillaFace", "Face")) ?? _constructedFaces.GetRandomItem();
+                GorillaFace face = _constructedFaces.FirstOrDefault(face => face.Name == PlayerPrefs.GetString("GorillaFace", "Default")) ?? _constructedFaces.GetRandomItem();
                 Material material = await _assetLoader.LoadAsset<Material>("Face Material");
 
                 material.SetTexture("_Base", face.Base);

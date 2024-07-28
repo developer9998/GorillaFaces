@@ -35,12 +35,6 @@
 		<Reference Include="Cinemachine">
 			<HintPath>$(GameAssemblyPath)\Cinemachine.dll</HintPath>
 		</Reference>
-		<Reference Include="GorillaInfoWatch">
-			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Gorilla Tag\BepInEx\plugins\GorillaInfoWatch\GorillaInfoWatch.dll</HintPath>
-		</Reference>
-		<Reference Include="GorillaInterface">
-			<HintPath>$(PluginsPath)\GorillaInterface\GorillaInterface.dll</HintPath>
-		</Reference>
 		<Reference Include="Mono.Security">
 			<HintPath>$(GameAssemblyPath)\Mono.Security.dll</HintPath>
 		</Reference>

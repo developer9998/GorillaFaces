@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
@@ -277,6 +277,9 @@
 		</Reference>
 		<Reference Include="UnityEngine.XRModule">
 			<HintPath>$(GameAssemblyPath)\UnityEngine.XRModule.dll</HintPath>
+		</Reference>
+    <Reference Include="GorillaComputer">
+			<HintPath>$(PluginsPath)\GorillaComputer\GorillaComputer.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 </Project>

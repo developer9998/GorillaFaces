@@ -1,4 +1,4 @@
-﻿namespace GorillaFaces
+namespace GorillaFaces
 {
     public class Constants
     {

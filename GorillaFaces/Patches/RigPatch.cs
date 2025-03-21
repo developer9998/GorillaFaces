@@ -1,4 +1,4 @@
-﻿using GorillaFaces.Behaviours;
+using GorillaFaces.Behaviours;
 using HarmonyLib;
 
 namespace GorillaFaces.Patches

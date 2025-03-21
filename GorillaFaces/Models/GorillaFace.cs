@@ -1,14 +1,21 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace GorillaFaces.Models
 {
-    public class GorillaFace
-    {
-        public string Name, Path;
+	public class GorillaFace
+	{
+		public string Name;
 
-        public Texture2D[] MouthArray = new Texture2D[11];
-        public Texture2D[] EyeArray = new Texture2D[5];
+		public string Path;
 
-        public Texture2D Base, MouthSheet, EyeSheet;
-    }
+		public Texture2D[] MouthArray = (Texture2D[])(object)new Texture2D[11];
+
+		public Texture2D[] EyeArray = (Texture2D[])(object)new Texture2D[5];
+
+		public Texture2D Base;
+
+		public Texture2D MouthSheet;
+
+		public Texture2D EyeSheet;
+	}
 }

@@ -1,10 +1,12 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 
-namespace GorillaFaces.Patches
+namespace GorillaFaces.Patches;
+
+[HarmonyPatch(typeof(GorillaEyeExpressions), "SliceUpdate")]
+public class ExpressionPatch
 {
-    [HarmonyPatch(typeof(GorillaEyeExpressions), "InvokeUpdate")]
-    public class ExpressionPatch
-    {
-        public static bool Prefix() => false;
-    }
+	public static bool Prefix()
+	{
+		return false;
+	}
 }

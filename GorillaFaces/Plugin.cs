@@ -1,71 +1,70 @@
-﻿using BepInEx;
-using BepInEx.Logging;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using BepInEx;
 using GorillaExtensions;
 using GorillaFaces.Behaviours;
 using GorillaFaces.Models;
 using GorillaFaces.Tools;
 using HarmonyLib;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using UnityEngine;
 
 namespace GorillaFaces
 {
-    [BepInPlugin(Constants.GUID, Constants.Name, Constants.Version)]
-    public class Plugin : BaseUnityPlugin
-    {
-        private readonly AssetLoader _assetLoader;
-        private readonly FaceConstructor _faceConstructor;
+	[BepInPlugin(Constants.GUID, Constants.Name, Constants.Version)]
+	public class Plugin : BaseUnityPlugin
+	{
+		public static Plugin Instance;
 
-        private List<GorillaFace> _constructedFaces = [];
+		public List<GorillaFace> Faces = [];
 
-        public Plugin()
-        {
-            _assetLoader = new AssetLoader();
-            _faceConstructor = new FaceConstructor();
+		private AssetLoader asset_loader;
 
-            Harmony.CreateAndPatchAll(typeof(Plugin).Assembly, Constants.GUID);
-            GorillaTagger.OnPlayerSpawned(Initialize);
-        }
+		private FaceConstructor face_constructor;
 
-        private async void Initialize()
-        {
-            try
-            {
-                _constructedFaces = await _faceConstructor.GetFaces(Path.GetDirectoryName(typeof(Plugin).Assembly.Location));
+		public void Awake()
+		{
+			Instance = this;
 
-                GorillaFace face = _constructedFaces.FirstOrDefault(face => face.Name == PlayerPrefs.GetString("GorillaFace", "Default")) ?? _constructedFaces.GetRandomItem();
-                Material material = await _assetLoader.LoadAsset<Material>("Face Material");
+			asset_loader = new AssetLoader();
+			face_constructor = new FaceConstructor();
 
-                material.SetTexture("_Base", face.Base);
-                material.SetTexture("_Eye", face.EyeSheet);
-                material.SetTexture("_Mouth", face.MouthSheet);
+			Harmony.CreateAndPatchAll(typeof(Plugin).Assembly, Constants.GUID);
+			GorillaTagger.OnPlayerSpawned(Initialize);
+		}
 
-                PhysicalFace.Face = face;
-                PhysicalFace.Material = material;
+		private async void Initialize()
+		{
+			try
+			{
+				Faces = await face_constructor.GetFaces(Path.GetDirectoryName(typeof(Plugin).Assembly.Location));
+				GorillaFace face = Faces.FirstOrDefault(face => face.Name == PlayerPrefs.GetString("GorillaFace", "Default")) ?? GTExt.GetRandomItem(Faces);
+				
+				Material material = await asset_loader.LoadAsset<Material>("Face Material");
+				material.SetTexture("_Base", (Texture)(object)face.Base);
+				material.SetTexture("_Eye", (Texture)(object)face.EyeSheet);
+				material.SetTexture("_Mouth", (Texture)(object)face.MouthSheet);
+				
+				PhysicalFace.Face = face;
+				PhysicalFace.Material = material;
 
-                Events.ApplyFace += OnFaceApplied;
+				Events.ApplyFace += OnFaceApplied;
+				GorillaTagger.Instance.offlineVRRig.headMesh.transform.Find("gorillaface").GetComponent<MeshRenderer>().material = new Material(PhysicalFace.Material);
+			}
+			catch (Exception ex)
+			{
+				Logger.LogError(ex);
+			}
+		}
 
-                GorillaTagger.Instance.offlineVRRig.headMesh.transform.Find("gorillaface").GetComponent<MeshRenderer>().material = new Material(PhysicalFace.Material);
-            }
-            catch (Exception ex)
-            {
-                Log(ex.ToString(), LogLevel.Error);
-            }
-        }
-
-        private void OnFaceApplied(GorillaFace face)
-        {
-            PhysicalFace.Face = face;
-
-            PlayerPrefs.SetString("GorillaFace", face.Name);
-            PhysicalFace.Material.SetTexture("_Base", PhysicalFace.Face.Base);
-            PhysicalFace.Material.SetTexture("_Eye", PhysicalFace.Face.EyeSheet);
-            PhysicalFace.Material.SetTexture("_Mouth", PhysicalFace.Face.MouthSheet);
-        }
-
-        private void Log(object message, LogLevel level = LogLevel.Info) => Logger.Log(level, message);
-    }
+		private void OnFaceApplied(GorillaFace face)
+		{
+			PhysicalFace.Face = face;
+			PlayerPrefs.SetString("GorillaFace", face.Name);
+			PhysicalFace.Material.SetTexture("_Base", (Texture)(object)PhysicalFace.Face.Base);
+			PhysicalFace.Material.SetTexture("_Eye", (Texture)(object)PhysicalFace.Face.EyeSheet);
+			PhysicalFace.Material.SetTexture("_Mouth", (Texture)(object)PhysicalFace.Face.MouthSheet);
+		}
+	}
 }

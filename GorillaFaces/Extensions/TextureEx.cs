@@ -1,32 +1,118 @@
 using UnityEngine;
+using System;
+using GorillaFaces.Tools;
 
 namespace GorillaFaces.Extensions
 {
     public static class TextureEx
     {
-        // https://stackoverflow.com/a/40854227
-        public static Texture2D WriteTexture(this Texture2D baseTex, Texture2D newTex, Vector2 coordinate)
+        public static Texture2D Clone(this Texture2D source)
         {
-            int startX = 0;
-            int startY = baseTex.height - newTex.height;
+            if (source is null)
+                throw new ArgumentNullException(nameof(source));
 
-            for (int x = startX; x < baseTex.width; x++)
+            RenderTexture renderTexture = RenderTexture.GetTemporary(source.width, source.height, 0, RenderTextureFormat.Default, RenderTextureReadWrite.Default);
+
+            Graphics.Blit(source, renderTexture);
+
+            RenderTexture active = RenderTexture.active;
+            RenderTexture.active = renderTexture;
+
+            Texture2D texture = new(source.width, source.height, TextureFormat.RGBA32, false)
             {
-                if (x < 0 || x >= newTex.width) continue;
-                for (int y = startY; y < baseTex.height; y++)
+                name = source.name,
+                filterMode = source.filterMode
+            };
+            texture.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
+            texture.Apply();
+
+            RenderTexture.active = active;
+            RenderTexture.ReleaseTemporary(renderTexture);
+
+            return texture;
+        }
+
+        public static Texture2D Overlay(this Texture2D source, Texture2D overlay, Vector2 pivot, bool overridePixels = true)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            if (overlay == null)
+                throw new ArgumentNullException(nameof(overlay));
+
+            if (!source.isReadable)
+                source = source.Clone(); // Assuming this creates a readable clone
+
+            int posX = (int)pivot.x;
+            int posY = (int)(pivot.y + overlay.height);
+
+            Logging.Info($"{overlay.name} overriding {source.name} at {posX}x{posY} ({pivot.x}, {pivot.y})");
+
+            for (int x = 0; x < overlay.width; x++)
+            {
+                for (int y = 0; y < overlay.height; y++)
                 {
-                    if (y < 0) continue;
+                    int destX = posX + x;
+                    int destY = posY + y;
 
-                    Color bgColor = baseTex.GetPixel(x - (int)coordinate.x, y - (int)coordinate.y);
-                    Color wmColor = newTex.GetPixel(x - startX, y - startY);
+                    if (destX < 0 || destX >= source.width || destY < 0 || destY >= source.height)
+                        continue;
 
-                    Color final_color = Color.Lerp(bgColor, wmColor, wmColor.a);
+                    Color overlayColor = overlay.GetPixel(x, y);
+                    Color sourceColor = source.GetPixel(destX, destY);
 
-                    baseTex.SetPixel(x + (int)coordinate.x, y - (int)coordinate.y, final_color);
+                    source.SetPixel(destX, destY, overridePixels ? overlayColor : Color.Lerp(sourceColor, overlayColor, overlayColor.a));
                 }
             }
 
-            return baseTex;
+            source.Apply();
+            return source;
+        }
+
+        public static Texture2D Resize(this Texture2D source, float scaleFactor)
+        {
+            if (source is null)
+                throw new ArgumentNullException(nameof(source));
+
+            if (scaleFactor <= 0)
+                throw new ArgumentOutOfRangeException(nameof(scaleFactor), "ScaleFactor must be a number larger than zero");
+
+            return source.Resize(new Vector2(Mathf.RoundToInt(source.width * scaleFactor), Mathf.RoundToInt(source.height * scaleFactor)));
+        }
+
+        public static Texture2D Resize(this Texture2D source, Vector2 size)
+        {
+            if (source is null)
+                throw new ArgumentNullException(nameof(source));
+
+            if (size.x <= 0 || size.y <= 0)
+                throw new ArgumentOutOfRangeException(nameof(size), "Size coordinates must be a number larger than zero");
+
+            if (!source.isReadable)
+                source = source.Clone();
+
+            int width = (int)size.x;
+            int height = (int)size.y;
+
+            Texture2D texture = new(width, height, source.format, false)
+            {
+                name = source.name,
+                filterMode = source.filterMode
+            };
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int targetX = Mathf.FloorToInt((float)x / width * source.width);
+                    int targetY = Mathf.FloorToInt((float)y / height * source.height);
+
+                    Color color = source.GetPixel(targetX, targetY);
+                    texture.SetPixel(x, y, color);
+                }
+            }
+
+            texture.Apply();
+            return texture;
         }
     }
 }

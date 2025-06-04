@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
@@ -6,18 +6,17 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="Resources\facebundle" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Include="Resources\facebundle" />
+	  <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>
 		<Reference Include="0Harmony">
 			<HintPath>$(BepInExAssemblyPath)\0Harmony.dll</HintPath>
 		</Reference>
-		<Reference Include="Assembly-CSharp">
+		<Reference Include="Assembly-CSharp" Publicize="true">
 			<HintPath>$(GameAssemblyPath)\Assembly-CSharp.dll</HintPath>
 		</Reference>
 		<Reference Include="Assembly-CSharp-firstpass">
@@ -34,6 +33,12 @@
 		</Reference>
 		<Reference Include="Cinemachine">
 			<HintPath>$(GameAssemblyPath)\Cinemachine.dll</HintPath>
+		</Reference>
+		<Reference Include="Fusion.Runtime">
+		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Gorilla Tag\Gorilla Tag_Data\Managed\Fusion.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="GorillaInfoWatch">
+		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Gorilla Tag\BepInEx\plugins\GorillaInfoWatch\GorillaInfoWatch.dll</HintPath>
 		</Reference>
 		<Reference Include="Mono.Security">
 			<HintPath>$(GameAssemblyPath)\Mono.Security.dll</HintPath>
@@ -277,9 +282,6 @@
 		</Reference>
 		<Reference Include="UnityEngine.XRModule">
 			<HintPath>$(GameAssemblyPath)\UnityEngine.XRModule.dll</HintPath>
-		</Reference>
-    <Reference Include="GorillaComputer">
-			<HintPath>$(PluginsPath)\GorillaComputer\GorillaComputer.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 </Project>

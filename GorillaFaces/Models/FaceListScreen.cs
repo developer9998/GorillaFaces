@@ -1,0 +1,71 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using GorillaFaces.Behaviours;
+using GorillaFaces.Tools;
+using GorillaInfoWatch.Attributes;
+using GorillaInfoWatch.Models;
+using GorillaInfoWatch.Models.Widgets;
+
+[assembly: WatchCompatibleMod]
+
+namespace GorillaFaces.Models
+{
+    [WatchCustomPage, DisplayAtHomeScreen]
+    public class FaceListScreen : WatchScreen
+    {
+        public override string Title => Constants.Name;
+
+        public override string Description => (Singleton<Main>.Instance is Main main && main.Faces is List<IFaceAsset> faces && main.LocalPlayer is GFacesPlayer localPlayer) ? $"{faces.Count} total faces - {(localPlayer.IsFaceLoaded ? "No face loaded" : $"{localPlayer.CustomFace.Name} loaded")}" : "GorillaFaces is importing custom faces from plugins";
+
+        public override void OnScreenOpen()
+        {
+            base.OnScreenOpen();
+
+            if (!Singleton<Main>.Instance.HasFaces)
+                Singleton<Main>.Instance.OnFacesLoaded += OnFacesLoaded;
+        }
+
+        public override void OnScreenClose()
+        {
+            base.OnScreenClose();
+
+            if (!Singleton<Main>.Instance.HasFaces)
+                Singleton<Main>.Instance.OnFacesLoaded -= OnFacesLoaded;
+        }
+
+        public void OnFacesLoaded()
+        {
+            Singleton<Main>.Instance.OnFacesLoaded -= OnFacesLoaded;
+
+            Logging.Info("Faces have been loaded!! Setting lines for screen");
+            SetContent();
+        }
+
+        public override ScreenContent GetContent()
+        {
+            if (Singleton<Main>.Instance is not Main main || main.Faces is not List<IFaceAsset> faces)
+                return new LineBuilder("Loading faces - please wait!");
+
+            LineBuilder lines = new();
+
+            foreach(IFaceAsset face in faces)
+            {
+                lines.AddLine(face.Name, new WidgetButton(UseFace, face));
+            }
+
+            return lines;
+        }
+
+        public void UseFace(bool isButtonPressed, params object[] parameters)
+        {
+            if (parameters.ElementAtOrDefault(0) is IFaceAsset customFace)
+            {
+                if (Singleton<Main>.Instance is not Main main || main.LocalPlayer is not GFacesPlayer facePlayer)
+                    return;
+
+                facePlayer.SwitchCustomFace(customFace);
+                SetContent();
+            }
+        }
+    }
+}

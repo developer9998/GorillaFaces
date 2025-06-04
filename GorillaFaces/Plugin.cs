@@ -1,70 +1,33 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using BepInEx;
-using GorillaExtensions;
+using BepInEx.Configuration;
+using BepInEx.Logging;
 using GorillaFaces.Behaviours;
-using GorillaFaces.Models;
+using GorillaFaces.Behaviours.Networking;
 using GorillaFaces.Tools;
 using HarmonyLib;
 using UnityEngine;
+using GorillaFaces.Models;
 
 namespace GorillaFaces
 {
-	[BepInPlugin(Constants.GUID, Constants.Name, Constants.Version)]
-	public class Plugin : BaseUnityPlugin
-	{
-		public static Plugin Instance;
+    [BepInPlugin(Constants.GUID, Constants.Name, Constants.Version)]
+    public class Plugin : BaseUnityPlugin
+    {
+        public static ManualLogSource MainLogSource;
 
-		public List<GorillaFace> Faces = [];
+        public static ConfigFile MainConfig;
 
-		private AssetLoader asset_loader;
+        public void Awake()
+        {
+            MainLogSource = Logger;
+            MainConfig = Config;
 
-		private FaceConstructor face_constructor;
+            Configuration.CurrentFace = MainConfig.Bind(Constants.Name, "Current Face", "Gorilla Face", "The name of the face currently used by the player.");
+            Configuration.DefaultFaceType = MainConfig.Bind(Constants.Name, "Default Face Type", EDefaultFaceType.Random, "The method used for handling assigning a face to a player without the mod.");
+            Configuration.DefaultFaceName = MainConfig.Bind(Constants.Name, "Default Face Name", "Gorilla Face", "The name of the defined default face. Default Face Type must be set to Assigned.");
 
-		public void Awake()
-		{
-			Instance = this;
-
-			asset_loader = new AssetLoader();
-			face_constructor = new FaceConstructor();
-
-			Harmony.CreateAndPatchAll(typeof(Plugin).Assembly, Constants.GUID);
-			GorillaTagger.OnPlayerSpawned(Initialize);
-		}
-
-		private async void Initialize()
-		{
-			try
-			{
-				Faces = await face_constructor.GetFaces(Path.GetDirectoryName(typeof(Plugin).Assembly.Location));
-				GorillaFace face = Faces.FirstOrDefault(face => face.Name == PlayerPrefs.GetString("GorillaFace", "Default")) ?? GTExt.GetRandomItem(Faces);
-				
-				Material material = await asset_loader.LoadAsset<Material>("Face Material");
-				material.SetTexture("_Base", (Texture)(object)face.Base);
-				material.SetTexture("_Eye", (Texture)(object)face.EyeSheet);
-				material.SetTexture("_Mouth", (Texture)(object)face.MouthSheet);
-				
-				PhysicalFace.Face = face;
-				PhysicalFace.Material = material;
-
-				Events.ApplyFace += OnFaceApplied;
-				GorillaTagger.Instance.offlineVRRig.headMesh.transform.Find("gorillaface").GetComponent<MeshRenderer>().material = new Material(PhysicalFace.Material);
-			}
-			catch (Exception ex)
-			{
-				Logger.LogError(ex);
-			}
-		}
-
-		private void OnFaceApplied(GorillaFace face)
-		{
-			PhysicalFace.Face = face;
-			PlayerPrefs.SetString("GorillaFace", face.Name);
-			PhysicalFace.Material.SetTexture("_Base", (Texture)(object)PhysicalFace.Face.Base);
-			PhysicalFace.Material.SetTexture("_Eye", (Texture)(object)PhysicalFace.Face.EyeSheet);
-			PhysicalFace.Material.SetTexture("_Mouth", (Texture)(object)PhysicalFace.Face.MouthSheet);
-		}
-	}
+            Harmony.CreateAndPatchAll(typeof(Plugin).Assembly, Constants.GUID);
+            GorillaTagger.OnPlayerSpawned(() => new GameObject(Constants.Name, typeof(Main), typeof(NetworkHandler)));
+        }
+    }
 }

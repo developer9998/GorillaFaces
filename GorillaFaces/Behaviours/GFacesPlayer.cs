@@ -53,7 +53,7 @@ namespace GorillaFaces.Behaviours
             if (IsFaceLoaded)
                 UnloadCustomFace();
 
-            Logging.Info($"Loading face {newFace.Name} for player {PlayerRef.NickName}");
+            //Logging.Info($"Loading face {newFace.Name} for player {PlayerRef.NickName}");
 
             IsFaceLoaded = true;
             CustomFace = newFace;
@@ -72,7 +72,7 @@ namespace GorillaFaces.Behaviours
             IsFaceLoaded = false;
             CustomFace = null;
 
-            Logging.Info($"Unloading face for player {PlayerRef.NickName}");
+            //Logging.Info($"Unloading face for player {PlayerRef.NickName}");
 
             faceMaterial.SetTexture(faceMaterialProperty, originalFace);
             faceMaterial.SetFloat(faceMaterialSliceProperty, atlasSlice);

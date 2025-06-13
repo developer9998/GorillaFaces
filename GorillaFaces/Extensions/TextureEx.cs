@@ -36,11 +36,15 @@ namespace GorillaFaces.Extensions
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
+
+            if (!source.isReadable)
+                throw new ArgumentException("Texture source is not readable", nameof(source));
+
             if (overlay == null)
                 throw new ArgumentNullException(nameof(overlay));
 
-            if (!source.isReadable)
-                source = source.Clone(); // Assuming this creates a readable clone
+            if (!overlay.isReadable)
+                throw new ArgumentException("Texture overlay is not readable", nameof(overlay));
 
             int posX = (int)pivot.x;
             int posY = (int)(pivot.y + overlay.height);
@@ -84,11 +88,11 @@ namespace GorillaFaces.Extensions
             if (source is null)
                 throw new ArgumentNullException(nameof(source));
 
+            if (!source.isReadable)
+                throw new ArgumentException("Texture source is not readable", nameof(source));
+
             if (size.x <= 0 || size.y <= 0)
                 throw new ArgumentOutOfRangeException(nameof(size), "Size coordinates must be a number larger than zero");
-
-            if (!source.isReadable)
-                source = source.Clone();
 
             int width = (int)size.x;
             int height = (int)size.y;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GorillaFaces.Behaviours;
 using GorillaFaces.Tools;
@@ -50,13 +51,13 @@ namespace GorillaFaces.Models
 
             foreach(IFaceAsset face in faces)
             {
-                lines.AddLine(face.Name, new WidgetButton(UseFace, face));
+                lines.AddLine(face.Name, new PushButton(UseFace, face));
             }
 
             return lines;
         }
 
-        public void UseFace(bool isButtonPressed, params object[] parameters)
+        public void UseFace(params object[] parameters)
         {
             if (parameters.ElementAtOrDefault(0) is IFaceAsset customFace)
             {

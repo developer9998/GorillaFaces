@@ -74,7 +74,8 @@ namespace GorillaFaces.Behaviours.Networking
                 return;
             }
 
-            networkedPlayer.TryFallbackFace();
+            if (!targetPlayer.CustomProperties.ContainsKey(Constants.CustomProperty))
+                networkedPlayer.TryFallbackFace();
         }
 
         #region unused interface methods

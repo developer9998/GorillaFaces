@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
-using GorillaExtensions;
+using System.Text;
 using GorillaFaces.Models;
 using GorillaFaces.Tools;
 using Photon.Realtime;
@@ -46,7 +45,7 @@ namespace GorillaFaces.Behaviours.Networking
 
             using (SHA256 sha = SHA256.Create())
             {
-                byte[] hash = sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(Owner.UserId));
+                byte[] hash = sha.ComputeHash(Encoding.UTF8.GetBytes(Owner.UserId));
                 int seed = BitConverter.ToInt32(hash, 0);
                 random = new Random(seed);
                 userIdBasedFace = faces[random.Next(0, faces.Count)];

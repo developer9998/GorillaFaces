@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using GorillaFaces.Behaviours;
 using GorillaFaces.Tools;
@@ -7,12 +6,10 @@ using GorillaInfoWatch.Attributes;
 using GorillaInfoWatch.Models;
 using GorillaInfoWatch.Models.Widgets;
 
-[assembly: WatchCompatibleMod]
-
 namespace GorillaFaces.Models
 {
-    [WatchCustomPage, DisplayAtHomeScreen]
-    public class FaceListScreen : WatchScreen
+    [ShowOnHomeScreen]
+    public class FaceListScreen : InfoWatchScreen
     {
         public override string Title => Constants.Name;
 
@@ -51,7 +48,7 @@ namespace GorillaFaces.Models
 
             foreach(IFaceAsset face in faces)
             {
-                lines.AddLine(face.Name, new PushButton(UseFace, face));
+                lines.Add(face.Name, new PushButton(UseFace, face));
             }
 
             return lines;

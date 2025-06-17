@@ -15,17 +15,17 @@ namespace GorillaFaces.Models
 
         public override string Description => (Singleton<Main>.Instance is Main main && main.Faces is List<IFaceAsset> faces && main.LocalPlayer is GFacesPlayer localPlayer) ? $"{faces.Count} total faces - {(localPlayer.IsFaceLoaded ? "No face loaded" : $"{localPlayer.CustomFace.Name} loaded")}" : "GorillaFaces is importing custom faces from plugins";
 
-        public override void OnScreenOpen()
+        public override void OnShow()
         {
-            base.OnScreenOpen();
+            base.OnShow();
 
             if (!Singleton<Main>.Instance.HasFaces)
                 Singleton<Main>.Instance.OnFacesLoaded += OnFacesLoaded;
         }
 
-        public override void OnScreenClose()
+        public override void OnClose()
         {
-            base.OnScreenClose();
+            base.OnClose();
 
             if (!Singleton<Main>.Instance.HasFaces)
                 Singleton<Main>.Instance.OnFacesLoaded -= OnFacesLoaded;
@@ -48,7 +48,7 @@ namespace GorillaFaces.Models
 
             foreach(IFaceAsset face in faces)
             {
-                lines.Add(face.Name, new PushButton(UseFace, face));
+                lines.Add(face.Name, new Widget_PushButton(UseFace, face));
             }
 
             return lines;

@@ -8,11 +8,10 @@ using GorillaInfoWatch.Models.Widgets;
 
 namespace GorillaFaces.Models
 {
-    [ShowOnHomeScreen]
+    [ShowOnHomeScreen(DisplayTitle = Constants.Name)]
     public class FaceListScreen : InfoWatchScreen
     {
-        public override string Title => Constants.Name;
-
+        public override string Title => "Faces";
         public override string Description => (Singleton<Main>.Instance is Main main && main.Faces is List<IFaceAsset> faces && main.LocalPlayer is GFacesPlayer localPlayer) ? $"{faces.Count} total faces - {(!localPlayer.IsFaceLoaded ? "No face loaded" : $"{localPlayer.CustomFace.Name} loaded")}" : "GorillaFaces is importing custom faces from plugins";
 
         public override void OnShow()

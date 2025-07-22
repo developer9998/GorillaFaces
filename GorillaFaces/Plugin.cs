@@ -7,6 +7,9 @@ using GorillaFaces.Tools;
 using HarmonyLib;
 using UnityEngine;
 using GorillaFaces.Models;
+using GorillaInfoWatch.Attributes;
+
+[assembly: InfoWatchCompatible]
 
 namespace GorillaFaces
 {

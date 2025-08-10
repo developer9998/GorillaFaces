@@ -2,14 +2,14 @@
 using System.Linq;
 using GorillaFaces.Behaviours;
 using GorillaFaces.Tools;
-using GorillaInfoWatch.Attributes;
 using GorillaInfoWatch.Models;
+using GorillaInfoWatch.Models.Attributes;
 using GorillaInfoWatch.Models.Widgets;
 
 namespace GorillaFaces.Models
 {
     [ShowOnHomeScreen(DisplayTitle = Constants.Name)]
-    public class FaceListScreen : InfoWatchScreen
+    public class FaceListScreen : Screen
     {
         public override string Title => "Faces";
         public override string Description => (Singleton<Main>.Instance is Main main && main.Faces is List<IFaceAsset> faces && main.LocalPlayer is GFacesPlayer localPlayer) ? $"{faces.Count} total faces - {(!localPlayer.IsFaceLoaded ? "No face loaded" : $"{localPlayer.CustomFace.Name} loaded")}" : "GorillaFaces is importing custom faces from plugins";
@@ -38,7 +38,7 @@ namespace GorillaFaces.Models
             SetContent();
         }
 
-        public override ScreenContent GetContent()
+        public override ScreenLines GetContent()
         {
             if (Singleton<Main>.Instance is not Main main || main.Faces is not List<IFaceAsset> faces)
                 return new LineBuilder("Loading faces - please wait!");

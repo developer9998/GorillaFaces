@@ -9,25 +9,19 @@ using GorillaInfoWatch.Models.Widgets;
 namespace GorillaFaces.Models
 {
     [ShowOnHomeScreen(DisplayTitle = Constants.Name)]
-    public class FaceListScreen : Screen
+    public class FaceListScreen : InfoScreen
     {
         public override string Title => "Faces";
         public override string Description => (Singleton<Main>.Instance is Main main && main.Faces is List<IFaceAsset> faces && main.LocalPlayer is GFacesPlayer localPlayer) ? $"{faces.Count} total faces - {(!localPlayer.IsFaceLoaded ? "No face loaded" : $"{localPlayer.CustomFace.Name} loaded")}" : "GorillaFaces is importing custom faces from plugins";
 
-        public override void OnShow()
+        public override void OnScreenLoad()
         {
-            base.OnShow();
-
-            if (!Singleton<Main>.Instance.HasFaces)
-                Singleton<Main>.Instance.OnFacesLoaded += OnFacesLoaded;
+            if (!Singleton<Main>.Instance.HasFaces) Singleton<Main>.Instance.OnFacesLoaded += OnFacesLoaded;
         }
 
-        public override void OnClose()
+        public override void OnScreenUnload()
         {
-            base.OnClose();
-
-            if (!Singleton<Main>.Instance.HasFaces)
-                Singleton<Main>.Instance.OnFacesLoaded -= OnFacesLoaded;
+            if (!Singleton<Main>.Instance.HasFaces) Singleton<Main>.Instance.OnFacesLoaded -= OnFacesLoaded;
         }
 
         public void OnFacesLoaded()
@@ -38,7 +32,7 @@ namespace GorillaFaces.Models
             SetContent();
         }
 
-        public override ScreenLines GetContent()
+        public override InfoContent GetContent()
         {
             if (Singleton<Main>.Instance is not Main main || main.Faces is not List<IFaceAsset> faces)
                 return new LineBuilder("Loading faces - please wait!");

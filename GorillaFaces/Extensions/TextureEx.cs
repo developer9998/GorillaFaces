@@ -1,6 +1,6 @@
-using UnityEngine;
-using System;
 using GorillaFaces.Tools;
+using System;
+using UnityEngine;
 
 namespace GorillaFaces.Extensions
 {

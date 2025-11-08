@@ -1,9 +1,9 @@
-﻿using System;
+﻿using GorillaFaces.Tools;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GorillaFaces.Tools;
 
 namespace GorillaFaces.Models
 {

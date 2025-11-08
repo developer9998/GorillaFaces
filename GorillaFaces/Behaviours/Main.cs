@@ -1,12 +1,12 @@
-﻿using System;
+﻿using GorillaFaces.Behaviours.Networking;
+using GorillaFaces.Models;
+using GorillaFaces.Tools;
+using Photon.Realtime;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GorillaFaces.Behaviours.Networking;
-using GorillaFaces.Models;
-using GorillaFaces.Tools;
-using Photon.Realtime;
 
 namespace GorillaFaces.Behaviours
 {

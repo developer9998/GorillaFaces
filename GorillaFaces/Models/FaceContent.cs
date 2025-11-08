@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using GorillaFaces.Behaviours;
+﻿using GorillaFaces.Behaviours;
+using System.Collections.Generic;
 
 namespace GorillaFaces.Models
 {

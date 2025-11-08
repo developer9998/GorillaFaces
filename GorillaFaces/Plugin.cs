@@ -3,11 +3,11 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using GorillaFaces.Behaviours;
 using GorillaFaces.Behaviours.Networking;
+using GorillaFaces.Models;
 using GorillaFaces.Tools;
+using GorillaInfoWatch.Models.Attributes;
 using HarmonyLib;
 using UnityEngine;
-using GorillaFaces.Models;
-using GorillaInfoWatch.Models.Attributes;
 
 [assembly: InfoWatchCompatible]
 

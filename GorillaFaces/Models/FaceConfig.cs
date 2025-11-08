@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using GorillaFaces.Extensions;
+using System.Collections.Generic;
 using System.Linq;
-using GorillaFaces.Extensions;
 using UnityEngine;
 
 namespace GorillaFaces.Models

@@ -1,11 +1,11 @@
-﻿using System;
+﻿using GorillaFaces.Models;
+using GorillaFaces.Tools;
+using Photon.Realtime;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using GorillaFaces.Models;
-using GorillaFaces.Tools;
-using Photon.Realtime;
 using UnityEngine;
 using Random = System.Random;
 
@@ -28,7 +28,7 @@ namespace GorillaFaces.Behaviours.Networking
         {
             if (!TryGetComponent(out facePlayer))
                 facePlayer = gameObject.AddComponent<GFacesPlayer>();
-           
+
             NetworkHandler.Instance.OnPlayerPropertyChanged += OnPlayerPropertyChanged;
 
             if (!HasGorillaFaces && Owner is PunNetPlayer punPlayer && punPlayer.PlayerRef is Player playerRef)

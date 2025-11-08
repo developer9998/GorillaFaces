@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using GorillaFaces.Behaviours;
+﻿using GorillaFaces.Behaviours;
 using GorillaFaces.Tools;
 using GorillaInfoWatch.Models;
 using GorillaInfoWatch.Models.Attributes;
 using GorillaInfoWatch.Models.Widgets;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GorillaFaces.Models
 {
@@ -39,7 +39,7 @@ namespace GorillaFaces.Models
 
             LineBuilder lines = new();
 
-            foreach(IFaceAsset face in faces)
+            foreach (IFaceAsset face in faces)
             {
                 lines.Add(face.Name, new Widget_PushButton(UseFace, face));
             }

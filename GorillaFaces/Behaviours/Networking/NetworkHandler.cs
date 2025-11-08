@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using ExitGames.Client.Photon;
+﻿using ExitGames.Client.Photon;
 using GorillaFaces.Tools;
 using Photon.Pun;
 using Photon.Realtime;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace GorillaFaces.Behaviours.Networking
@@ -81,22 +81,22 @@ namespace GorillaFaces.Behaviours.Networking
         #region unused interface methods
         public void OnPlayerEnteredRoom(Player newPlayer)
         {
-            
+
         }
 
         public void OnPlayerLeftRoom(Player otherPlayer)
         {
-            
+
         }
 
         public void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
         {
-            
+
         }
 
         public void OnMasterClientSwitched(Player newMasterClient)
         {
-            
+
         }
         #endregion
     }

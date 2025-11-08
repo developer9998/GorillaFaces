@@ -1,8 +1,7 @@
-﻿using System;
-using GorillaFaces.Models;
-using GorillaFaces.Tools;
+﻿using GorillaFaces.Models;
 using Photon.Pun;
 using Photon.Realtime;
+using System;
 using UnityEngine;
 
 namespace GorillaFaces.Behaviours

@@ -1,3 +1,5 @@
+using GorillaFaces.Extensions;
+using GorillaFaces.Tools;
 using System;
 using System.Globalization;
 using System.IO;
@@ -5,8 +7,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using GorillaFaces.Extensions;
-using GorillaFaces.Tools;
 using UnityEngine;
 
 namespace GorillaFaces.Models

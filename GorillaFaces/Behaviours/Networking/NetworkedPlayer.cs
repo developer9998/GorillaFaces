@@ -26,18 +26,20 @@ namespace GorillaFaces.Behaviours.Networking
 
         public void Start()
         {
-            if (!TryGetComponent(out facePlayer))
-                facePlayer = gameObject.AddComponent<GFacesPlayer>();
+            if (!TryGetComponent(out facePlayer)) facePlayer = gameObject.AddComponent<GFacesPlayer>();
 
             NetworkHandler.Instance.OnPlayerPropertyChanged += OnPlayerPropertyChanged;
 
             if (!HasGorillaFaces && Owner is PunNetPlayer punPlayer && punPlayer.PlayerRef is Player playerRef)
+            {
+                TryFallbackFace();
                 NetworkHandler.Instance.OnPlayerPropertiesUpdate(playerRef, playerRef.CustomProperties);
+            }
         }
 
         public void LoadFallbackFaces()
         {
-            if (hasFallbackFaces || Singleton<Main>.Instance is not Main main || main.Faces is not List<IFaceAsset> faces || main.LocalPlayer is not GFacesPlayer localPlayer)
+            if (hasFallbackFaces || Main.Instance.Faces is not List<IFaceAsset> faces)
                 return;
 
             Random random = new();
@@ -56,11 +58,10 @@ namespace GorillaFaces.Behaviours.Networking
 
         public void TryFallbackFace()
         {
-            if (HasGorillaFaces || Singleton<Main>.Instance is not Main main || main.Faces is not List<IFaceAsset> faces || main.LocalPlayer is not GFacesPlayer localPlayer)
+            if (HasGorillaFaces || Main.Instance.Faces is not List<IFaceAsset> faces || Main.Instance.LocalPlayer is not GFacesPlayer localPlayer)
                 return;
 
-            if (!hasFallbackFaces)
-                LoadFallbackFaces();
+            if (!hasFallbackFaces) LoadFallbackFaces();
 
             if (hasFallbackFaces)
             {
@@ -73,10 +74,8 @@ namespace GorillaFaces.Behaviours.Networking
                         facePlayer.LoadCustomFace(userIdBasedFace);
                         break;
                     case EDefaultFaceType.Matching:
-                        if (localPlayer.IsFaceLoaded)
-                            facePlayer.LoadCustomFace(localPlayer.CustomFace);
-                        else
-                            facePlayer.UnloadCustomFace();
+                        if (localPlayer.HasLoadedFace) facePlayer.LoadCustomFace(localPlayer.CustomFace);
+                        else facePlayer.UnloadCustomFace();
                         break;
                     case EDefaultFaceType.Assigned:
                         if (faces.Find(face => face.Name == Configuration.DefaultFaceName.Value) is IFaceAsset assignedFace)
@@ -93,7 +92,7 @@ namespace GorillaFaces.Behaviours.Networking
         {
             NetworkHandler.Instance.OnPlayerPropertyChanged -= OnPlayerPropertyChanged;
 
-            if (HasGorillaFaces || facePlayer.IsFaceLoaded)
+            if (HasGorillaFaces || facePlayer.HasLoadedFace)
             {
                 HasGorillaFaces = false;
                 facePlayer.UnloadCustomFace();
@@ -102,17 +101,14 @@ namespace GorillaFaces.Behaviours.Networking
 
         public void OnPlayerPropertyChanged(NetPlayer player, Dictionary<string, object> properties)
         {
-            if (player == Owner)
-            {
-                Logging.Info($"{player.NickName} got properties: {string.Join(", ", properties.Select(prop => $"[{prop.Key}: {prop.Value}]"))}");
+            if (player != Owner) return;
 
-                if (properties.TryGetValue("CustomFace", out object obj) && obj is string faceName)
-                {
-                    if (Singleton<Main>.Instance.GetFace(faceName) is IFaceAsset customFace)
-                        facePlayer.LoadCustomFace(customFace);
-                    else
-                        facePlayer.UnloadCustomFace();
-                }
+            Logging.Info($"{player.NickName} got properties: {string.Join(", ", properties.Select(prop => $"[{prop.Key}: {prop.Value}]"))}");
+
+            if (properties.TryGetValue("CustomFace", out object obj) && obj is string faceName)
+            {
+                if (Main.Instance.GetFace(faceName) is IFaceAsset customFace) facePlayer.LoadCustomFace(customFace);
+                else facePlayer.UnloadCustomFace();
             }
         }
     }

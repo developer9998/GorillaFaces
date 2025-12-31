@@ -6,19 +6,19 @@ using UnityEngine;
 
 namespace GorillaFaces.Behaviours
 {
-    [RequireComponent(typeof(RigContainer))]
+    [RequireComponent(typeof(RigContainer)), DisallowMultipleComponent]
     public class GFacesPlayer : MonoBehaviour
     {
         public RigContainer Container;
 
-        public Player PlayerRef;
+        public Player Creator;
 
         public GorillaMouthFlap MouthFlap;
 
         public Action<IFaceAsset> OnFaceLoaded;
         public Action OnFaceUnloaded;
 
-        public bool IsFaceLoaded;
+        public bool HasLoadedFace;
         public IFaceAsset CustomFace;
 
         private Material faceMaterial;
@@ -34,9 +34,8 @@ namespace GorillaFaces.Behaviours
         public void Awake()
         {
             Container = GetComponent<RigContainer>();
-            PlayerRef = Container.Rig.isLocal ? PhotonNetwork.LocalPlayer : Container.Creator.GetPlayerRef();
-
-            MouthFlap = GetComponent<GorillaMouthFlap>() ?? Container.Rig.myMouthFlap;
+            Creator = Container.Rig.isLocal ? PhotonNetwork.LocalPlayer : Container.Creator.GetPlayerRef();
+            MouthFlap = Container.Rig.myMouthFlap ?? GetComponent<GorillaMouthFlap>();
 
             faceMaterial = MouthFlap.targetFaceRenderer is Renderer renderer ? renderer.material : MouthFlap.targetFace.GetComponent<Renderer>().material;
             originalFace = faceMaterial.GetTexture(faceMaterialProperty) as Texture2DArray;
@@ -49,26 +48,26 @@ namespace GorillaFaces.Behaviours
             if (newFace is null)
                 throw new ArgumentNullException(nameof(newFace));
 
-            if (IsFaceLoaded)
+            if (HasLoadedFace)
                 UnloadCustomFace();
 
             //Logging.Info($"Loading face {newFace.Name} for player {PlayerRef.NickName}");
 
-            IsFaceLoaded = true;
+            HasLoadedFace = true;
             CustomFace = newFace;
 
-            faceMaterial.SetTexture(faceMaterialProperty, newFace.FaceTextureArray);
+            faceMaterial.SetTexture(faceMaterialProperty, newFace.FaceMap);
             faceMaterial.SetInt(faceMaterialSliceProperty, 0);
-            faceMaterial.SetTexture(mouthMaterialProperty, newFace.MouthTexture);
+            faceMaterial.SetTexture(mouthMaterialProperty, newFace.MouthMap);
 
             OnFaceLoaded?.Invoke(newFace);
         }
 
         public void UnloadCustomFace()
         {
-            if (!IsFaceLoaded) return;
+            if (!HasLoadedFace) return;
 
-            IsFaceLoaded = false;
+            HasLoadedFace = false;
             CustomFace = null;
 
             //Logging.Info($"Unloading face for player {PlayerRef.NickName}");
@@ -82,10 +81,8 @@ namespace GorillaFaces.Behaviours
 
         public void SwitchCustomFace(IFaceAsset customFace)
         {
-            if (CustomFace != customFace)
-                LoadCustomFace(customFace);
-            else
-                UnloadCustomFace();
+            if (CustomFace != customFace) LoadCustomFace(customFace);
+            else UnloadCustomFace();
         }
     }
 }

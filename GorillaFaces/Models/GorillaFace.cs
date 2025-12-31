@@ -13,12 +13,12 @@ namespace GorillaFaces.Models
 {
     public class GorillaFace : IFaceAsset
     {
-        public string FilePath { get; private set; }
+        public string Location { get; private set; }
 
         public string Name { get; private set; }
 
-        public Texture2DArray FaceTextureArray { get; private set; }
-        public Texture2D MouthTexture { get; private set; }
+        public Texture2DArray FaceMap { get; private set; }
+        public Texture2D MouthMap { get; private set; }
 
         private readonly Texture2D[] FaceTexArray = new Texture2D[5];
 
@@ -30,11 +30,11 @@ namespace GorillaFaces.Models
 
         private readonly CultureInfo cultureInfo = new("en-US");
 
-        public async Task<IFaceAsset> Construct(string filePath, FaceConfig faceConfig)
+        public async Task<IFaceAsset> Construct(string filePath, FaceParameters faceConfig)
         {
             Logging.Info($"GorillaFace constructing from file: {filePath}");
 
-            FilePath = filePath;
+            Location = filePath;
             Name = Path.GetFileNameWithoutExtension(filePath);
 
             using ZipArchive archive = ZipFile.OpenRead(filePath);
@@ -71,7 +71,9 @@ namespace GorillaFaces.Models
                         continue;
                     }
 
-                    int index = int.Parse(Regex.Match(entryNameNoEx, @"\d+").Value, cultureInfo);
+                    int index = int.TryParse(Regex.Match(entryNameNoEx, @"\d+").Value, NumberStyles.Integer, cultureInfo, out int result) ? result : -1;
+
+                    if (index == -1) continue;
 
                     if (entryNameNoEx.StartsWith("face"))
                     {
@@ -111,9 +113,9 @@ namespace GorillaFaces.Models
             array.SetPixels(rawFaceTexture.GetPixels(), 0, 0);
             array.Apply();
 
-            FaceTextureArray = array;
+            FaceMap = array;
 
-            Texture2D mouthSheet = faceConfig.MouthTexture.Clone();
+            Texture2D mouthSheet = faceConfig.MouthMap.Clone();
             mouthSheet.name = "MouthSheet";
 
             float scaleFactor = 2;
@@ -147,7 +149,7 @@ namespace GorillaFaces.Models
             }
 
             mouthSheet.Apply();
-            MouthTexture = mouthSheet;
+            MouthMap = mouthSheet;
 
             return this;
         }

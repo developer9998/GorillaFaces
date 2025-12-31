@@ -7,11 +7,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace GorillaFaces.Behaviours
 {
-    internal class Main : Singleton<Main>
+    internal class Main : MonoBehaviour
     {
+        public static Main Instance { get; private set; }
+
         public bool HasFaces => Faces != null;
 
         public FaceLoader Loader;
@@ -24,13 +27,19 @@ namespace GorillaFaces.Behaviours
 
         private Dictionary<string, IFaceAsset> dictNameToFace;
 
-        public override async void Initialize()
+        public async void Awake()
         {
-            DontDestroyOnLoad(gameObject);
+            if (Instance != null && Instance != this)
+            {
+                Destroy(this);
+                return;
+            }
 
-            VRRig offlineVRRig = GorillaTagger.Instance.offlineVRRig;
+            Instance = this;
 
-            Loader = new FaceLoader(Path.GetDirectoryName(typeof(Plugin).Assembly.Location), new FaceConfig(offlineVRRig.myMouthFlap, offlineVRRig.myEyeExpressions));
+            VRRig localRig = GorillaTagger.Instance.offlineVRRig;
+
+            Loader = new FaceLoader(Path.GetDirectoryName(typeof(Plugin).Assembly.Location), new FaceParameters(localRig.myMouthFlap, localRig.myEyeExpressions));
 
             Faces = await Loader.GetAllFaces();
 
@@ -38,8 +47,8 @@ namespace GorillaFaces.Behaviours
                 .DistinctBy(face => face.Name)
                 .ToDictionary(face => face.Name, face => face);
 
-            LocalPlayer = offlineVRRig.gameObject.AddComponent<GFacesPlayer>();
-            LocalPlayer.OnFaceLoaded += (IFaceAsset currentFace) =>
+            LocalPlayer = localRig.gameObject.AddComponent<GFacesPlayer>();
+            LocalPlayer.OnFaceLoaded += currentFace =>
             {
                 NetworkHandler.Instance.SetProperty("CustomFace", currentFace.Name);
                 Configuration.CurrentFace.Value = currentFace.Name;
@@ -49,6 +58,7 @@ namespace GorillaFaces.Behaviours
                 NetworkHandler.Instance.SetProperty("CustomFace", string.Empty);
                 Configuration.CurrentFace.Value = string.Empty;
             };
+
             if (GetFace(Configuration.CurrentFace.Value) is IFaceAsset currentFace)
             {
                 LocalPlayer.LoadCustomFace(currentFace);

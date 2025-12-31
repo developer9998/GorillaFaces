@@ -5,12 +5,10 @@ namespace GorillaFaces.Models
 {
     public interface IFaceAsset
     {
-        public string FilePath { get; }
+        public string Location { get; }
         public string Name { get; }
-
-        public Texture2DArray FaceTextureArray { get; }
-        public Texture2D MouthTexture { get; }
-
-        Task<IFaceAsset> Construct(string filePath, FaceConfig faceConfig);
+        public Texture2DArray FaceMap { get; }
+        public Texture2D MouthMap { get; }
+        Task<IFaceAsset> Construct(string filePath, FaceParameters faceConfig);
     }
 }

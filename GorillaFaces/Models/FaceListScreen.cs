@@ -12,21 +12,21 @@ namespace GorillaFaces.Models
     public class FaceListScreen : InfoScreen
     {
         public override string Title => "Faces";
-        public override string Description => (Singleton<Main>.Instance is Main main && main.Faces is List<IFaceAsset> faces && main.LocalPlayer is GFacesPlayer localPlayer) ? $"{faces.Count} total faces - {(!localPlayer.IsFaceLoaded ? "No face loaded" : $"{localPlayer.CustomFace.Name} loaded")}" : "GorillaFaces is importing custom faces from plugins";
+        public override string Description => (Main.Instance.Faces is List<IFaceAsset> faces && Main.Instance.LocalPlayer is GFacesPlayer localPlayer) ? $"{faces.Count} total faces - {(!localPlayer.HasLoadedFace ? "No face loaded" : $"{localPlayer.CustomFace.Name} loaded")}" : "GorillaFaces is importing custom faces from plugins";
 
         public override void OnScreenLoad()
         {
-            if (!Singleton<Main>.Instance.HasFaces) Singleton<Main>.Instance.OnFacesLoaded += OnFacesLoaded;
+            if (!Main.Instance.HasFaces) Main.Instance.OnFacesLoaded += OnFacesLoaded;
         }
 
         public override void OnScreenUnload()
         {
-            if (!Singleton<Main>.Instance.HasFaces) Singleton<Main>.Instance.OnFacesLoaded -= OnFacesLoaded;
+            if (!Main.Instance.HasFaces) Main.Instance.OnFacesLoaded -= OnFacesLoaded;
         }
 
         public void OnFacesLoaded()
         {
-            Singleton<Main>.Instance.OnFacesLoaded -= OnFacesLoaded;
+            Main.Instance.OnFacesLoaded -= OnFacesLoaded;
 
             Logging.Info("Faces have been loaded!! Setting lines for screen");
             SetContent();
@@ -34,7 +34,7 @@ namespace GorillaFaces.Models
 
         public override InfoContent GetContent()
         {
-            if (Singleton<Main>.Instance is not Main main || main.Faces is not List<IFaceAsset> faces)
+            if (Main.Instance is not Main main || main.Faces is not List<IFaceAsset> faces)
                 return new LineBuilder("Loading faces - please wait!");
 
             LineBuilder lines = new();
@@ -51,7 +51,7 @@ namespace GorillaFaces.Models
         {
             if (parameters.ElementAtOrDefault(0) is IFaceAsset customFace)
             {
-                if (Singleton<Main>.Instance is not Main main || main.LocalPlayer is not GFacesPlayer facePlayer)
+                if (Main.Instance is not Main main || main.LocalPlayer is not GFacesPlayer facePlayer)
                     return;
 
                 facePlayer.SwitchCustomFace(customFace);

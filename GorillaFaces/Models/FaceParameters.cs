@@ -5,22 +5,22 @@ using UnityEngine;
 
 namespace GorillaFaces.Models
 {
-    public class FaceConfig
+    public struct FaceParameters
     {
-        public Vector2 FaceSize;
+        public Vector2 MapScale;
 
-        public Texture2D MouthTexture;
+        public Texture2D MouthMap;
 
         public Dictionary<string, Vector2> MouthCoordinates;
 
-        public FaceConfig(GorillaMouthFlap mouthFlap, GorillaEyeExpressions eyeExpressions)
+        public FaceParameters(GorillaMouthFlap mouthFlap, GorillaEyeExpressions eyeExpressions)
         {
             Material material = mouthFlap.targetFace.GetComponent<Renderer>().material;
 
             Vector4 vector = material.GetVector(eyeExpressions._BaseMap_ST);
-            FaceSize = new(vector.x, vector.y);
+            MapScale = new(vector.x, vector.y);
 
-            MouthTexture = (material.GetTexture(mouthFlap._MouthMap) as Texture2D).Clone();
+            MouthMap = (material.GetTexture(mouthFlap._MouthMap) as Texture2D).Clone();
 
             MouthCoordinates = [];
             for (int i = 0; i < mouthFlap.mouthFlapLevels.Length; i++)

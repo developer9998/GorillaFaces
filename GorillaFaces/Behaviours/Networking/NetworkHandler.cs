@@ -9,95 +9,78 @@ using UnityEngine;
 
 namespace GorillaFaces.Behaviours.Networking
 {
-    internal class NetworkHandler : Singleton<NetworkHandler>, IInRoomCallbacks
+    internal class NetworkHandler : MonoBehaviourPunCallbacks
     {
+        public static NetworkHandler Instance { get; private set; }
+
         public Action<NetPlayer, Dictionary<string, object>> OnPlayerPropertyChanged;
 
-        private readonly Dictionary<string, object> properties = [];
-        private bool set_properties = false;
-        private float properties_timer;
+        private readonly Dictionary<string, object> _properties = [];
+        private bool _setProperties;
+        private float _setPropertyTimer;
 
         public void Start()
         {
-            if (NetworkSystem.Instance && NetworkSystem.Instance is NetworkSystemPUN)
+            if (Instance != null && Instance != this)
             {
-                SetProperty("Version", Constants.Version);
-
-                PhotonNetwork.AddCallbackTarget(this);
-                Application.quitting += () => PhotonNetwork.RemoveCallbackTarget(this);
+                Destroy(this);
                 return;
             }
 
-            enabled = false; // either no netsys or not in a pun environment - i doubt fusion will ever come
+            Instance = this;
+
+            if (NetworkSystem.Instance && NetworkSystem.Instance is NetworkSystemPUN)
+            {
+                SetProperty("Version", Constants.Version);
+                return;
+            }
+
+            enabled = false;
         }
 
-        public void FixedUpdate()
+        public void Update()
         {
-            properties_timer -= Time.deltaTime;
+            _setPropertyTimer -= Time.deltaTime;
 
-            if (set_properties && properties.Count > 0 && properties_timer <= 0)
+            if (_setProperties && _properties.Count > 0 && _setPropertyTimer <= 0)
             {
                 PhotonNetwork.LocalPlayer.SetCustomProperties(new()
                 {
                     {
                         Constants.CustomProperty,
-                        new Dictionary<string, object>(properties)
+                        _properties
                     }
                 });
 
-                set_properties = false;
-                properties_timer = Constants.NetworkSetInterval;
+                _setProperties = false;
+                _setPropertyTimer = Constants.NetworkSetInterval;
             }
         }
 
         public void SetProperty(string key, object value)
         {
-            if (properties.ContainsKey(key)) properties[key] = value;
-            else properties.Add(key, value);
-            set_properties = true;
+            if (_properties.ContainsKey(key)) _properties[key] = value;
+            else _properties.Add(key, value);
+
+            _setProperties = true;
         }
 
-        public void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+        public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
         {
             NetPlayer netPlayer = NetworkSystem.Instance.GetPlayer(targetPlayer.ActorNumber);
 
-            if (netPlayer.IsLocal || !VRRigCache.Instance.TryGetVrrig(netPlayer, out RigContainer playerRig) || !playerRig.TryGetComponent(out NetworkedPlayer networkedPlayer))
+            if (netPlayer.IsLocal || !VRRigCache.rigsInUse.TryGetValue(netPlayer, out RigContainer playerRig) || !playerRig.TryGetComponent(out NetworkedPlayer networkedPlayer))
                 return;
 
-            if (changedProps.TryGetValue(Constants.CustomProperty, out object props_object) && props_object is Dictionary<string, object> properties)
+            if (changedProps.TryGetValue(Constants.CustomProperty, out object property) && property is Dictionary<string, object> dictionary)
             {
                 networkedPlayer.HasGorillaFaces = true;
 
-                Logging.Info($"Recieved properties from {netPlayer.NickName}: {string.Join(", ", properties.Select(prop => $"[{prop.Key}: {prop.Value}]"))}");
-                OnPlayerPropertyChanged?.Invoke(netPlayer, properties);
+                Logging.Info($"Recieved properties from {netPlayer.NickName}: {string.Join(", ", dictionary.Select(prop => $"[{prop.Key}: {prop.Value}]"))}");
+                OnPlayerPropertyChanged?.Invoke(netPlayer, dictionary);
 
                 return;
             }
-
-            if (!targetPlayer.CustomProperties.ContainsKey(Constants.CustomProperty))
-                networkedPlayer.TryFallbackFace();
         }
-
-        #region unused interface methods
-        public void OnPlayerEnteredRoom(Player newPlayer)
-        {
-
-        }
-
-        public void OnPlayerLeftRoom(Player otherPlayer)
-        {
-
-        }
-
-        public void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
-        {
-
-        }
-
-        public void OnMasterClientSwitched(Player newMasterClient)
-        {
-
-        }
-        #endregion
     }
 }

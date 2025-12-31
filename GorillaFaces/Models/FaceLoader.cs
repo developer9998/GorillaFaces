@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace GorillaFaces.Models
 {
-    public class FaceLoader(string basePath, FaceConfig faceConfig)
+    public class FaceLoader(string basePath, FaceParameters faceConfig)
     {
         public string BasePath = basePath;
 
-        public FaceConfig FaceConfig = faceConfig;
+        public FaceParameters FaceConfig = faceConfig;
 
         public async Task<List<IFaceAsset>> GetAllFaces()
         {

@@ -64,26 +64,24 @@ namespace GorillaFaces.Behaviours
                 LocalPlayer.LoadCustomFace(currentFace);
             }
 
-            CheckProperties();
+            ForEachNetworkedPlayer(player => player.CheckProperties());
+
             Configuration.DefaultFaceType.SettingChanged += (object sender, EventArgs args) =>
             {
-                CheckProperties();
+                ForEachNetworkedPlayer(player => player.TryFallbackFace());
             };
 
             OnFacesLoaded?.Invoke();
         }
 
-        public void CheckProperties()
+        private void ForEachNetworkedPlayer(Action<NetworkedPlayer> action)
         {
-            if (NetworkSystem.Instance.InRoom)
+            if (!NetworkSystem.Instance.InRoom || !VRRigCache.isInitialized) return;
+
+            foreach (RigContainer playerRig in VRRigCache.rigsInUse.Values)
             {
-                foreach (var netPlayer in NetworkSystem.Instance.PlayerListOthers)
-                {
-                    if (netPlayer is PunNetPlayer punNetPlayer && punNetPlayer.PlayerRef is Player player)
-                    {
-                        NetworkHandler.Instance.OnPlayerPropertiesUpdate(player, player.CustomProperties);
-                    }
-                }
+                if (!playerRig.TryGetComponent(out NetworkedPlayer component)) continue;
+                action(component);
             }
         }
 

@@ -1,5 +1,7 @@
-﻿using GorillaFaces.Models;
+﻿using Fusion;
+using GorillaFaces.Models;
 using GorillaFaces.Tools;
+using Photon.Pun;
 using Photon.Realtime;
 using System;
 using System.Collections.Generic;
@@ -16,6 +18,7 @@ namespace GorillaFaces.Behaviours.Networking
     {
         public VRRig Rig;
         public NetPlayer Owner;
+        public Player PlayerRef;
 
         public bool HasGorillaFaces;
 
@@ -30,11 +33,19 @@ namespace GorillaFaces.Behaviours.Networking
 
             NetworkHandler.Instance.OnPlayerPropertyChanged += OnPlayerPropertyChanged;
 
-            if (!HasGorillaFaces && Owner is PunNetPlayer punPlayer && punPlayer.PlayerRef is Player playerRef)
+            PlayerRef = (Owner is PunNetPlayer punNetPlayer) ? punNetPlayer.PlayerRef : PhotonNetwork.CurrentRoom.GetPlayer(Owner.ActorNumber);
+
+            if (!HasGorillaFaces)
             {
                 TryFallbackFace();
-                NetworkHandler.Instance.OnPlayerPropertiesUpdate(playerRef, playerRef.CustomProperties);
+                CheckProperties();
             }
+        }
+
+        public void CheckProperties()
+        {
+            if (PlayerRef is null) return;
+            NetworkHandler.Instance.OnPlayerPropertiesUpdate(PlayerRef, PlayerRef.CustomProperties);
         }
 
         public void LoadFallbackFaces()

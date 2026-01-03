@@ -52,11 +52,13 @@ namespace GorillaFaces.Behaviours
             {
                 NetworkHandler.Instance.SetProperty("CustomFace", currentFace.Name);
                 Configuration.CurrentFace.Value = currentFace.Name;
+                ForEachNetworkedPlayer(player => player.TryFallbackFace());
             };
             LocalPlayer.OnFaceUnloaded += () =>
             {
                 NetworkHandler.Instance.SetProperty("CustomFace", string.Empty);
                 Configuration.CurrentFace.Value = string.Empty;
+                ForEachNetworkedPlayer(player => player.TryFallbackFace());
             };
 
             if (GetFace(Configuration.CurrentFace.Value) is IFaceAsset currentFace)
@@ -66,7 +68,7 @@ namespace GorillaFaces.Behaviours
 
             ForEachNetworkedPlayer(player => player.CheckProperties());
 
-            Configuration.DefaultFaceType.SettingChanged += (object sender, EventArgs args) =>
+            Configuration.DefaultFaceType.SettingChanged += (_, _) =>
             {
                 ForEachNetworkedPlayer(player => player.TryFallbackFace());
             };

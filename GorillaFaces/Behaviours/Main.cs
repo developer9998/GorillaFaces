@@ -1,7 +1,6 @@
 ﻿using GorillaFaces.Behaviours.Networking;
 using GorillaFaces.Models;
 using GorillaFaces.Tools;
-using Photon.Realtime;
 using System;
 using System.Collections.Generic;
 using System.IO;

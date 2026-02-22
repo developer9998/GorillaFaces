@@ -1,11 +1,10 @@
-﻿using Fusion;
+﻿using ExitGames.Client.Photon;
 using GorillaFaces.Models;
 using GorillaFaces.Tools;
 using Photon.Pun;
 using Photon.Realtime;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
@@ -27,11 +26,19 @@ namespace GorillaFaces.Behaviours.Networking
         private bool hasFallbackFaces;
         private IFaceAsset randomFace, userIdBasedFace;
 
+        private bool _initialize;
+
         public void Start()
         {
-            if (!TryGetComponent(out facePlayer)) facePlayer = gameObject.AddComponent<GFacesPlayer>();
+            Initialize();
+        }
 
-            NetworkHandler.Instance.OnPlayerPropertyChanged += OnPlayerPropertyChanged;
+        public void Initialize()
+        {
+            if (_initialize) return;
+            _initialize = true;
+
+            if (!TryGetComponent(out facePlayer)) facePlayer = gameObject.AddComponent<GFacesPlayer>();
 
             PlayerRef = (Owner is PunNetPlayer punNetPlayer) ? punNetPlayer.PlayerRef : PhotonNetwork.CurrentRoom.GetPlayer(Owner.ActorNumber);
 
@@ -101,8 +108,6 @@ namespace GorillaFaces.Behaviours.Networking
 
         public void OnDestroy()
         {
-            NetworkHandler.Instance.OnPlayerPropertyChanged -= OnPlayerPropertyChanged;
-
             if (HasGorillaFaces || facePlayer.HasLoadedFace)
             {
                 HasGorillaFaces = false;
@@ -110,11 +115,9 @@ namespace GorillaFaces.Behaviours.Networking
             }
         }
 
-        public void OnPlayerPropertyChanged(NetPlayer player, Dictionary<string, object> properties)
+        public void OnPlayerPropertyChanged(Hashtable properties)
         {
-            if (player != Owner) return;
-
-            Logging.Info($"{player.NickName} got properties: {string.Join(", ", properties.Select(prop => $"[{prop.Key}: {prop.Value}]"))}");
+            if (!_initialize) Initialize();
 
             if (properties.TryGetValue("CustomFace", out object obj) && obj is string faceName)
             {

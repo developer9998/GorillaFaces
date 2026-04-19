@@ -17,10 +17,10 @@ namespace GorillaFaces.Models
         {
             Material material = mouthFlap.targetFace.GetComponent<Renderer>().material;
 
-            Vector4 vector = material.GetVector(eyeExpressions._BaseMap_ST);
+            Vector4 vector = material.GetVector("_BaseMap_ST");
             MapScale = new(vector.x, vector.y);
 
-            MouthMap = (material.GetTexture(mouthFlap._MouthMap) as Texture2D).Clone();
+            MouthMap = (material.GetTexture("_MouthMap") as Texture2D).Clone();
 
             MouthCoordinates = [];
             for (int i = 0; i < mouthFlap.mouthFlapLevels.Length; i++)

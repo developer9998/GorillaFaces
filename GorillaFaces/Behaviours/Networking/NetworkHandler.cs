@@ -1,5 +1,5 @@
 ﻿using ExitGames.Client.Photon;
-using GorillaFaces.Tools;
+using GorillaLibrary.Utilities;
 using Photon.Pun;
 using Photon.Realtime;
 using System;
@@ -17,7 +17,7 @@ internal class NetworkHandler : MonoBehaviourPunCallbacks
 
     private readonly byte eventCode = 176;
 
-    private readonly int id = StaticHash.Compute(Constants.CustomProperty.GetStaticHash());
+    private readonly int id = StaticHash.Compute("GFaces".GetStaticHash());
 
     private Hashtable _properties = [];
     private bool _isPropertiesReady;
@@ -30,8 +30,6 @@ internal class NetworkHandler : MonoBehaviourPunCallbacks
         Instance = this;
 
         PhotonNetwork.NetworkingClient.EventReceived += OnEvent;
-
-        PhotonNetwork.LocalPlayer.SetCustomProperties(new() { { Constants.CustomProperty, Constants.Version } });
     }
 
     public void Update()
@@ -41,16 +39,15 @@ internal class NetworkHandler : MonoBehaviourPunCallbacks
         if (_isPropertiesReady && _propertySetTimer <= 0)
         {
             _isPropertiesReady = false;
-            _propertySetTimer = Constants.NetworkSetInterval;
+            _propertySetTimer = 0.5f;
 
             try
             {
                 SendProperties(_properties, [.. from player in playerArray where IsCompatiblePlayer(player) select player]);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Logging.Fatal("NetworkSolution failed to send player properties");
-                Logging.Error(ex);
+                
             }
         }
     }
@@ -79,7 +76,7 @@ internal class NetworkHandler : MonoBehaviourPunCallbacks
 
     public void NotifyPropertiesRecieved(Player player, Hashtable properties)
     {
-        Logging.Info($"{player}: {string.Join(", ", properties)}");
+        // Logging.Info($"{player}: {string.Join(", ", properties)}");
         OnPlayerPropertiesChanged?.Invoke(player, properties);
     }
 
@@ -120,16 +117,15 @@ internal class NetworkHandler : MonoBehaviourPunCallbacks
         base.OnPlayerEnteredRoom(newPlayer);
         playerArray = PhotonNetwork.PlayerListOthers;
 
-        while (VRRigCache.rigsInUse.All(player => player.Key.ActorNumber != newPlayer.ActorNumber)) await Task.Delay(PhotonNetwork.GetPing());
+        while (RigUtility.Rigs.All(player => player.Key.ActorNumber != newPlayer.ActorNumber)) await Task.Delay(PhotonNetwork.GetPing());
 
         try
         {
             SendProperties(_properties, [newPlayer]);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Logging.Fatal("NetworkSolution failed to send player properties");
-            Logging.Error(ex);
+            
         }
     }
 
@@ -152,7 +148,7 @@ internal class NetworkHandler : MonoBehaviourPunCallbacks
 
         Player player = PhotonNetwork.CurrentRoom.GetPlayer(data.Sender);
         NetPlayer netPlayer = NetworkSystem.Instance.GetPlayer(data.Sender);
-        if (player.IsLocal || !VRRigCache.Instance.TryGetVrrig(netPlayer, out RigContainer playerRig) || !playerRig.TryGetComponent(out NetworkedPlayer networkedPlayer)) return;
+        if (player.IsLocal || !RigUtility.TryGetRig(netPlayer, out RigContainer playerRig) || !playerRig.TryGetComponent(out NetworkedPlayer networkedPlayer)) return;
 
         if (eventData[1] is Hashtable properties)
         {

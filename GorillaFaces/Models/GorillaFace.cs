@@ -1,5 +1,4 @@
 using GorillaFaces.Extensions;
-using GorillaFaces.Tools;
 using System;
 using System.Globalization;
 using System.IO;
@@ -32,7 +31,7 @@ namespace GorillaFaces.Models
 
         public async Task<IFaceAsset> Construct(string filePath, FaceParameters faceConfig)
         {
-            Logging.Info($"GorillaFace constructing from file: {filePath}");
+            // Logging.Info($"GorillaFace constructing from file: {filePath}");
 
             Location = filePath;
             Name = Path.GetFileNameWithoutExtension(filePath);
@@ -44,11 +43,11 @@ namespace GorillaFaces.Models
             {
                 string entryNameNoEx = Path.GetFileNameWithoutExtension(entry.Name);
 
-                Logging.Info($"Processing entry: {entryNameNoEx}");
+                // Logging.Info($"Processing entry: {entryNameNoEx}");
 
                 if (entry.Name.EndsWith(".png"))
                 {
-                    Logging.Info($"Loading as texture");
+                    // Logging.Info($"Loading as texture");
 
                     using MemoryStream memoryStream = new();
                     await entry.Open().CopyToAsync(memoryStream);
@@ -65,7 +64,7 @@ namespace GorillaFaces.Models
 
                     if (entryNameNoEx.StartsWith("nomic"))
                     {
-                        Logging.Info("NoMic texture");
+                        // Logging.Info("NoMic texture");
 
                         NoMicTex = texture;
                         continue;
@@ -77,12 +76,12 @@ namespace GorillaFaces.Models
 
                     if (entryNameNoEx.StartsWith("face"))
                     {
-                        Logging.Info($"Face texture {index - 1}");
+                        // Logging.Info($"Face texture {index - 1}");
                         FaceTexArray[index - 1] = texture;
                     }
                     else if (entryNameNoEx.StartsWith("mouth"))
                     {
-                        Logging.Info($"Mouth texture {index}");
+                        // Logging.Info($"Mouth texture {index}");
                         MouthTexArray[index] = texture;
                     }
 

@@ -2,7 +2,7 @@
 
 namespace GorillaFaces.Models
 {
-    public enum EDefaultFaceType
+    public enum FaceAssignment
     {
         [Description("No custom faces are loaded, instead using the base game face")]
         None,
@@ -13,6 +13,6 @@ namespace GorillaFaces.Models
         [Description("A custom face used by the local player is loaded")]
         Matching,
         [Description("A specified custom face is loaded")]
-        Assigned
+        Static
     }
 }

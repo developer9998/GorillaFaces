@@ -1,6 +1,5 @@
 ﻿using ExitGames.Client.Photon;
 using GorillaFaces.Models;
-using GorillaFaces.Tools;
 using Photon.Pun;
 using Photon.Realtime;
 using System;
@@ -21,7 +20,7 @@ namespace GorillaFaces.Behaviours.Networking
 
         public bool HasGorillaFaces;
 
-        private GFacesPlayer facePlayer;
+        private Client facePlayer;
 
         private bool hasFallbackFaces;
         private IFaceAsset randomFace, userIdBasedFace;
@@ -38,7 +37,7 @@ namespace GorillaFaces.Behaviours.Networking
             if (_initialize) return;
             _initialize = true;
 
-            if (!TryGetComponent(out facePlayer)) facePlayer = gameObject.AddComponent<GFacesPlayer>();
+            if (!TryGetComponent(out facePlayer)) facePlayer = gameObject.AddComponent<Client>();
 
             PlayerRef = (Owner is PunNetPlayer punNetPlayer) ? punNetPlayer.PlayerRef : PhotonNetwork.CurrentRoom.GetPlayer(Owner.ActorNumber);
 
@@ -57,7 +56,7 @@ namespace GorillaFaces.Behaviours.Networking
 
         public void LoadFallbackFaces()
         {
-            if (hasFallbackFaces || Main.Instance.Faces is not List<IFaceAsset> faces)
+            if (hasFallbackFaces || Core.Instance.Faces is not List<IFaceAsset> faces)
                 return;
 
             Random random = new();
@@ -76,27 +75,27 @@ namespace GorillaFaces.Behaviours.Networking
 
         public void TryFallbackFace()
         {
-            if (HasGorillaFaces || Main.Instance.Faces is not List<IFaceAsset> faces || Main.Instance.LocalPlayer is not GFacesPlayer localPlayer)
+            if (HasGorillaFaces || Core.Instance.Faces is not List<IFaceAsset> faces || Core.Instance.LocalPlayer is not Client localPlayer)
                 return;
 
             if (!hasFallbackFaces) LoadFallbackFaces();
 
             if (hasFallbackFaces)
             {
-                switch (Configuration.DefaultFaceType.Value)
+                switch (Mod.DefaultFaceType.Value)
                 {
-                    case EDefaultFaceType.Random:
+                    case FaceAssignment.Random:
                         facePlayer.LoadCustomFace(randomFace);
                         break;
-                    case EDefaultFaceType.RandomSeed:
+                    case FaceAssignment.RandomSeed:
                         facePlayer.LoadCustomFace(userIdBasedFace);
                         break;
-                    case EDefaultFaceType.Matching:
+                    case FaceAssignment.Matching:
                         if (localPlayer.HasLoadedFace) facePlayer.LoadCustomFace(localPlayer.CustomFace);
                         else facePlayer.UnloadCustomFace();
                         break;
-                    case EDefaultFaceType.Assigned:
-                        if (faces.Find(face => face.Name == Configuration.DefaultFaceName.Value) is IFaceAsset assignedFace)
+                    case FaceAssignment.Static:
+                        if (faces.Find(face => face.Name == Mod.DefaultFaceName.Value) is IFaceAsset assignedFace)
                             facePlayer.LoadCustomFace(assignedFace);
                         else
                             facePlayer.UnloadCustomFace();
@@ -121,7 +120,7 @@ namespace GorillaFaces.Behaviours.Networking
 
             if (properties.TryGetValue("CustomFace", out object obj) && obj is string faceName)
             {
-                if (Main.Instance.GetFace(faceName) is IFaceAsset customFace) facePlayer.LoadCustomFace(customFace);
+                if (Core.Instance.GetFace(faceName) is IFaceAsset customFace) facePlayer.LoadCustomFace(customFace);
                 else facePlayer.UnloadCustomFace();
             }
         }

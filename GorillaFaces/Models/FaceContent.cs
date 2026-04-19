@@ -7,6 +7,6 @@ namespace GorillaFaces.Models
     {
         public List<IFaceAsset> Faces;
 
-        public GFacesPlayer LocalPlayer;
+        public Client LocalPlayer;
     }
 }

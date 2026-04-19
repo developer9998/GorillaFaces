@@ -1,5 +1,4 @@
-﻿using GorillaFaces.Tools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -45,10 +44,8 @@ namespace GorillaFaces.Models
 
                     faces.Add(asset);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    Logging.Fatal($"Error constructing face: {file}");
-                    Logging.Error(ex);
                     File.Move(file, string.Concat(file, ".broken"));
                 }
             }

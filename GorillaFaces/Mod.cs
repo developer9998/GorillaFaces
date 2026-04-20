@@ -4,6 +4,7 @@ using GorillaFaces.Behaviours.Networking;
 using GorillaFaces.Models;
 using GorillaInfoWatch.Models.Attributes;
 using GorillaLibrary;
+using GorillaLibrary.Extensions;
 using MelonLoader;
 using UnityEngine;
 
@@ -25,11 +26,11 @@ internal class Mod : GorillaMod
     public override void OnInitializeMelon()
     {
         MelonPreferences_Category category = CreateCategory("GorillaFaces");
-        CurrentFace = category.CreateEntry("Current Face", "Gorilla Face", "Current Face", "The face given to the local player", false, false, null);
-        DefaultFaceType = category.CreateEntry("Face Assignment", FaceAssignment.Random, "Face Assignment", "The means of assigning faces to other players", false, false, null);
-        DefaultFaceName = category.CreateEntry("Face Override", "Gorilla Face", "Face Override", "The face given to other players with the Static assignment", false, false, null);
+        CurrentFace = category.CreateSimpleEntry("Current Face", "Gorilla Face", "The face given to the local player");
+        DefaultFaceType = category.CreateSimpleEntry("Face Assignment", FaceAssignment.Random, "The means of assigning faces to other players");
+        DefaultFaceName = category.CreateSimpleEntry("Face Override", "Gorilla Face", "The face given to other players with the Static assignment");
 
-        Events.Game.OnGameInitialized.Subscribe(() =>
+        Events.Core.OnGameInitialized.Subscribe(() =>
         {
             Object.DontDestroyOnLoad(new GameObject("GorillaFaces", typeof(Core), typeof(NetworkHandler)));
         });

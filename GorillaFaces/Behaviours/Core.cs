@@ -2,10 +2,12 @@
 using GorillaFaces.Extensions;
 using GorillaFaces.Models;
 using GorillaLibrary.Utilities;
+using MelonLoader.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -39,7 +41,12 @@ internal class Core : MonoBehaviour
 
         VRRig localRig = GorillaTagger.Instance.offlineVRRig;
 
-        Loader = new FaceLoader(Path.GetDirectoryName(typeof(Mod).Assembly.Location), new FaceParameters(localRig.GetMouthFlap(), localRig.GetEyeExpressions()));
+        string modDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        if (modDirectory == MelonEnvironment.ModsDirectory) modDirectory = Path.Combine(modDirectory, "GorillaFaces");
+
+        if (!Directory.Exists(modDirectory)) Directory.CreateDirectory(modDirectory);
+
+        Loader = new FaceLoader(modDirectory, new FaceParameters(localRig.GetMouthFlap(), localRig.GetEyeExpressions()));
 
         Faces = await Loader.GetAllFaces();
 

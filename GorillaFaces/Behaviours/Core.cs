@@ -2,13 +2,11 @@
 using GorillaFaces.Extensions;
 using GorillaFaces.Models;
 using GorillaLibrary.Utilities;
-using MelonLoader.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace GorillaFaces.Behaviours;
@@ -42,10 +40,6 @@ internal class Core : MonoBehaviour
         VRRig localRig = GorillaTagger.Instance.offlineVRRig;
 
         string modDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        if (modDirectory == MelonEnvironment.ModsDirectory) modDirectory = Path.Combine(modDirectory, "GorillaFaces");
-
-        if (!Directory.Exists(modDirectory)) Directory.CreateDirectory(modDirectory);
-
         Loader = new FaceLoader(modDirectory, new FaceParameters(localRig.GetMouthFlap(), localRig.GetEyeExpressions()));
 
         Faces = await Loader.GetAllFaces();
@@ -58,27 +52,27 @@ internal class Core : MonoBehaviour
         LocalPlayer.OnFaceLoaded += currentFace =>
         {
             NetworkHandler.Instance.SetProperty("CustomFace", currentFace.Name);
-            Mod.CurrentFace.Value = currentFace.Name;
+            Plugin.CurrentFace.Value = currentFace.Name;
             ForEachNetworkedPlayer(player => player.TryFallbackFace());
         };
         LocalPlayer.OnFaceUnloaded += () =>
         {
             NetworkHandler.Instance.SetProperty("CustomFace", string.Empty);
-            Mod.CurrentFace.Value = string.Empty;
+            Plugin.CurrentFace.Value = string.Empty;
             ForEachNetworkedPlayer(player => player.TryFallbackFace());
         };
 
-        if (GetFace(Mod.CurrentFace.Value) is IFaceAsset currentFace)
+        if (GetFace(Plugin.CurrentFace.Value) is IFaceAsset currentFace)
         {
             LocalPlayer.LoadCustomFace(currentFace);
         }
 
         ForEachNetworkedPlayer(player => player.CheckProperties());
 
-        Mod.DefaultFaceType.OnEntryValueChanged.Subscribe((_, _) =>
+        Plugin.DefaultFaceType.SettingChanged += (_, _) =>
         {
             ForEachNetworkedPlayer(player => player.TryFallbackFace());
-        });
+        };
 
         OnFacesLoaded?.Invoke();
     }

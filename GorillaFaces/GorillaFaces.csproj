@@ -7,9 +7,9 @@
 
 	<ItemGroup>
 		<Reference Include="0Harmony">
-			<HintPath>$(MelonLoaderAssemblyPath)\0Harmony.dll</HintPath>
+			<HintPath>$(BepInExAssemblyPath)\0Harmony.dll</HintPath>
 		</Reference>
-		<Reference Include="Assembly-CSharp">
+		<Reference Include="Assembly-CSharp" Publicize="true">
 			<HintPath>$(GameAssemblyPath)\Assembly-CSharp.dll</HintPath>
 		</Reference>
 		<Reference Include="Assembly-CSharp-firstpass">
@@ -18,23 +18,29 @@
 		<Reference Include="BakeryRuntimeAssembly">
 			<HintPath>$(GameAssemblyPath)\BakeryRuntimeAssembly.dll</HintPath>
 		</Reference>
+		<Reference Include="BepInEx">
+			<HintPath>$(BepInExAssemblyPath)\BepInEx.dll</HintPath>
+		</Reference>
+		<Reference Include="BepInEx.Harmony">
+			<HintPath>$(BepInExAssemblyPath)\BepInEx.Harmony.dll</HintPath>
+		</Reference>
+		<Reference Include="Cinemachine">
+			<HintPath>$(GameAssemblyPath)\Cinemachine.dll</HintPath>
+		</Reference>
 		<Reference Include="Fusion.Runtime">
 			<HintPath>$(GameAssemblyPath)\Fusion.Runtime.dll</HintPath>
 		</Reference>
-		<Reference Include="GorillaLibrary">
-		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Gorilla Tag\Mods\GorillaLibrary.dll</HintPath>
-		</Reference>
-		<Reference Include="MelonLoader">
-			<HintPath>$(MelonLoaderAssemblyPath)\MelonLoader.dll</HintPath>
-		</Reference>
-		<Reference Include="Newtonsoft.Json">
-			<HintPath>$(MelonLoaderAssemblyPath)\Newtonsoft.Json.dll</HintPath>
-		</Reference>
 		<Reference Include="GorillaInfoWatch">
-		  <HintPath>$(ModsPath)\GorillaInfoWatch.dll</HintPath>
+		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Gorilla Tag\BepInEx\plugins\GorillaInfoWatch\GorillaInfoWatch.dll</HintPath>
+		</Reference>
+		<Reference Include="GorillaLibrary">
+			<HintPath>$(PluginsPath)\GorillaLibrary\GorillaLibrary.dll</HintPath>
 		</Reference>
 		<Reference Include="Mono.Security">
 			<HintPath>$(GameAssemblyPath)\Mono.Security.dll</HintPath>
+		</Reference>
+		<Reference Include="Newtonsoft.Json">
+			<HintPath>$(GameAssemblyPath)\Newtonsoft.Json.dll</HintPath>
 		</Reference>
 		<Reference Include="Oculus.Platform">
 			<HintPath>$(GameAssemblyPath)\Oculus.Platform.dll</HintPath>
@@ -86,6 +92,12 @@
 		</Reference>
 		<Reference Include="Unity.Mathematics">
 			<HintPath>$(GameAssemblyPath)\Unity.Mathematics.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.RenderPipelines.Universal.Runtime">
+			<HintPath>$(GameAssemblyPath)\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.TextMeshPro">
+			<HintPath>$(GameAssemblyPath)\Unity.TextMeshPro.dll</HintPath>
 		</Reference>
 		<Reference Include="Unity.Timeline">
 			<HintPath>$(GameAssemblyPath)\Unity.Timeline.dll</HintPath>
@@ -176,6 +188,9 @@
 		</Reference>
 		<Reference Include="UnityEngine.PhysicsModule">
 			<HintPath>$(GameAssemblyPath)\UnityEngine.PhysicsModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.ProfilerModule">
+			<HintPath>$(GameAssemblyPath)\UnityEngine.ProfilerModule.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.ScreenCaptureModule">
 			<HintPath>$(GameAssemblyPath)\UnityEngine.ScreenCaptureModule.dll</HintPath>

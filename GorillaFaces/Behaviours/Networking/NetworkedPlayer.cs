@@ -82,7 +82,7 @@ namespace GorillaFaces.Behaviours.Networking
 
             if (hasFallbackFaces)
             {
-                switch (Mod.DefaultFaceType.Value)
+                switch (Plugin.DefaultFaceType.Value)
                 {
                     case FaceAssignment.Random:
                         facePlayer.LoadCustomFace(randomFace);
@@ -95,7 +95,7 @@ namespace GorillaFaces.Behaviours.Networking
                         else facePlayer.UnloadCustomFace();
                         break;
                     case FaceAssignment.Static:
-                        if (faces.Find(face => face.Name == Mod.DefaultFaceName.Value) is IFaceAsset assignedFace)
+                        if (faces.Find(face => face.Name == Plugin.DefaultFaceName.Value) is IFaceAsset assignedFace)
                             facePlayer.LoadCustomFace(assignedFace);
                         else
                             facePlayer.UnloadCustomFace();
